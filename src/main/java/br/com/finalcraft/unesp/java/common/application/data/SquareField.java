@@ -1,5 +1,7 @@
 package br.com.finalcraft.unesp.java.common.application.data;
 
+import br.com.finalcraft.unesp.java.common.application.CheckersTheGame;
+
 import java.io.Serializable;
 
 public class SquareField implements Serializable {
@@ -39,6 +41,10 @@ public class SquareField implements Serializable {
     public void setPiece(Piece piece) {
         this.piece = piece;
         if (piece != null) piece.setSquareField(this);
+    }
+
+    public SquareField getAdjacent(int xDislock, int yDislock){
+        return CheckersTheGame.instance.getSquareField(this.xCoord + xDislock, this.yCoord + yDislock);
     }
 
     @Override

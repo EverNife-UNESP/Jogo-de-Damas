@@ -1,6 +1,7 @@
 package br.com.finalcraft.unesp.java.server.tcphandler;
 
 import br.com.finalcraft.unesp.java.common.SmartLogger;
+import br.com.finalcraft.unesp.java.common.application.CheckersTheGame;
 import br.com.finalcraft.unesp.java.common.tcpmessage.TCPMessage;
 
 import java.io.ObjectInputStream;
@@ -23,10 +24,14 @@ public class ServerSocketThread extends Thread{
         this.identifier = "[" + clientConnecting.getInetAddress().getHostAddress() + " - " + clientConnecting.getLocalPort() + "]";
     }
 
-    public void sendToClient(TCPMessage tcpMessage) throws Exception{
-        info("Sending TCPMessage." + tcpMessage.getClass().getSimpleName() + " to client: " + tcpMessage.toString());
-        objectOutputStream.flush();
-        objectOutputStream.writeObject(tcpMessage);
+    public void sendToClient(TCPMessage tcpMessage){
+        try {
+            info("Sending TCPMessage." + tcpMessage.getClass().getSimpleName() + " to client: " + tcpMessage.toString());
+            objectOutputStream.flush();
+            objectOutputStream.writeObject(tcpMessage);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public TCPMessage readFromClient() throws Exception{
@@ -65,6 +70,14 @@ public class ServerSocketThread extends Thread{
 
     public void handleTCPMessage(TCPMessage tcpMessage) throws Exception{
 
+        if (tcpMessage instanceof TCPMessage.CheckersTable){
+            handleTCPMessageCheckersTable((TCPMessage.CheckersTable) tcpMessage);
+        }
+
+    }
+
+    public void handleTCPMessageCheckersTable(TCPMessage.CheckersTable tcpMessage){
+        CheckersTheGame.updateNewInstance(tcpMessage.getTheTable());
     }
 
 }

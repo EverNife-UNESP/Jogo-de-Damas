@@ -1,9 +1,16 @@
 package br.com.finalcraft.unesp.java.common.application;
 
+import br.com.finalcraft.unesp.java.client.javafx.controller.CheckersController;
+import br.com.finalcraft.unesp.java.client.tcp.ClientSideTCP;
 import br.com.finalcraft.unesp.java.common.application.data.*;
 import br.com.finalcraft.unesp.java.common.application.data.enums.MoveAttempt;
 import br.com.finalcraft.unesp.java.common.application.data.enums.MoveResult;
 import br.com.finalcraft.unesp.java.common.application.data.enums.PlayerType;
+import br.com.finalcraft.unesp.java.common.tcpmessage.TCPMessage;
+import br.com.finalcraft.unesp.java.common.tcpmessage.TCPMessageDirection;
+import br.com.finalcraft.unesp.java.main.javafx.controller.TrueMainController;
+import br.com.finalcraft.unesp.java.server.tcphandler.ServerSideTCP;
+import javafx.application.Platform;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -13,9 +20,40 @@ public class CheckersTheGame implements Serializable {
 
     public static CheckersTheGame instance = new CheckersTheGame().iniciarTabelueiro();
 
+    public static boolean isSinglePlayer = false;
+
+    public static void updateNewInstance(CheckersTheGame checkersTheGame){
+        instance = checkersTheGame;
+        instance.refreshGameRender();
+    }
+
     public SquareField[][] tabuleiro = new SquareField[8][8];
     public PlayerType playersTurn = null;
     public List<SquareField> allSquareFields = new ArrayList<>();
+
+    public boolean isMyTurn(Piece piece){
+        return piece.getOwner() == playersTurn;
+    }
+
+    public void endMyTurn(){
+            if (playersTurn == PlayerType.PLAYER_ONE){
+                instance.playersTurn = PlayerType.PLAYER_TWO;
+                if (!isSinglePlayer) ServerSideTCP.getClient().sendToClient(new TCPMessage.CheckersTable(instance, TCPMessageDirection.CLIENT_TO_SERVER));
+            }else {
+                instance.playersTurn = PlayerType.PLAYER_ONE;
+                if (!isSinglePlayer) ClientSideTCP.sendToServer(new TCPMessage.CheckersTable(instance, TCPMessageDirection.CLIENT_TO_SERVER));
+            }
+
+        refreshGameRender();
+    }
+
+    public void refreshGameRender(){
+        Platform.runLater(() -> {
+            CheckersController.instance.updateCheckersTable();
+        });
+    }
+
+    // --------------------------------------------------------------
 
     public CheckersTheGame iniciarTabelueiro(){
         for (int i = 0; i < tabuleiro.length; i++) {
@@ -35,7 +73,7 @@ public class CheckersTheGame implements Serializable {
         for (int i = 0; i < 3; i++) {                       //Linha 1 2 e 3
             for (int j = 0; j < tabuleiro[i].length; j++) {
                 if (tabuleiro[i][j].isValid()){
-                    tabuleiro[i][j].setPiece(new Piece(playerToPlayerFirst));
+                    tabuleiro[i][j].setPiece(new Piece(playerToPlayerFirst.getOpponent()));
                 }
             }
         }
@@ -43,7 +81,7 @@ public class CheckersTheGame implements Serializable {
         for (int i = 5; i < tabuleiro.length; i++) {        //Linha 6 7 8
             for (int j = 0; j < tabuleiro[i].length; j++) {
                 if (tabuleiro[i][j].isValid()){
-                    tabuleiro[i][j].setPiece(new Piece(playerToPlayerFirst.getOpponent()));
+                    tabuleiro[i][j].setPiece(new Piece(playerToPlayerFirst));
                 }
             }
         }
@@ -66,6 +104,10 @@ public class CheckersTheGame implements Serializable {
         MoveAttempt moveAttempt = piece.canMoveTo(target);
         if (moveAttempt.getDirection() == MoveAttempt.Direction.UNAVAILABLE){        //Trying impossible Movement
             return MoveResult.FAIL;
+        }
+
+        if (moveAttempt.getIntermedium() != null){
+            moveAttempt.getIntermedium().getSquareField().setPiece(null);
         }
 
         piece.moveTo(target);

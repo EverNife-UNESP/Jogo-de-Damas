@@ -1,7 +1,8 @@
 package br.com.finalcraft.unesp.java.common.tcpmessage;
 
+import br.com.finalcraft.unesp.java.common.application.CheckersTheGame;
+
 import java.io.Serializable;
-import java.math.BigInteger;
 
 public abstract class TCPMessage implements Serializable {
 
@@ -10,21 +11,22 @@ public abstract class TCPMessage implements Serializable {
         return direction;
     }
 
-    public static class Calculator extends TCPMessage{
-        String theExpression;
+    public static class CheckersTable extends TCPMessage{
 
-        public String getTheExpression() {
-            return theExpression;
+        CheckersTheGame theTable;
+
+        public CheckersTable(CheckersTheGame theTable, TCPMessageDirection direction) {
+            this.theTable = theTable;
+            this.direction = direction;
         }
 
-        public Calculator(String theExpression, TCPMessageDirection direction) {
-            this.theExpression = theExpression;
-            this.direction = direction;
+        public CheckersTheGame getTheTable() {
+            return theTable;
         }
 
         @Override
         public String toString() {
-            return "[" + direction + " - TheExpression: \"" + theExpression + "\"]";
+            return "[" + direction + " - The Entire GameBoard]";
         }
     }
 

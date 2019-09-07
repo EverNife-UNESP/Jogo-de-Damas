@@ -30,24 +30,37 @@ public class Piece implements Serializable {
     public MoveAttempt canMoveTo(SquareField target){
         int xCoord = this.squareField.getXCoord();
         int yCoord = this.squareField.getYCoord();
+
         int targetXCoord = target.getXCoord();
         int targetYCoord = target.getYCoord();
 
-        if (targetXCoord == xCoord + 1 && targetYCoord == yCoord + 1) return new MoveAttempt(MoveAttempt.Direction.SIMPLE);
-        if (targetXCoord == xCoord - 1 && targetYCoord == yCoord - 1) return new MoveAttempt(MoveAttempt.Direction.SIMPLE);
-        if (targetXCoord == xCoord + 1 && targetYCoord == yCoord - 1) return new MoveAttempt(MoveAttempt.Direction.SIMPLE);
-        if (targetXCoord == xCoord - 1 && targetYCoord == yCoord + 1) return new MoveAttempt(MoveAttempt.Direction.SIMPLE);
+
+        if (owner == PlayerType.PLAYER_ONE){
+            if (targetXCoord == xCoord - 1 && targetYCoord == yCoord + 1) return new MoveAttempt(MoveAttempt.Direction.SIMPLE);
+            if (targetXCoord == xCoord - 1 && targetYCoord == yCoord - 1) return new MoveAttempt(MoveAttempt.Direction.SIMPLE);
+        }
+        if (owner == PlayerType.PLAYER_TWO){
+            if (targetXCoord == xCoord + 1 && targetYCoord == yCoord + 1) return new MoveAttempt(MoveAttempt.Direction.SIMPLE);
+            if (targetXCoord == xCoord + 1 && targetYCoord == yCoord - 1) return new MoveAttempt(MoveAttempt.Direction.SIMPLE);
+
+        }
 
         int intermediumXCoord = xCoord;
         int intermediumYCoord = yCoord;
 
-        if (targetXCoord == xCoord + 2 && targetYCoord == yCoord + 2) {intermediumXCoord += 2; intermediumYCoord += 2;}
-        if (targetXCoord == xCoord - 2 && targetYCoord == yCoord - 2) {intermediumXCoord -= 2; intermediumYCoord -= 2;}
-        if (targetXCoord == xCoord + 2 && targetYCoord == yCoord - 2) {intermediumXCoord += 2; intermediumYCoord -= 2;}
-        if (targetXCoord == xCoord - 2 && targetYCoord == yCoord + 1) {intermediumXCoord -= 2; intermediumYCoord += 2;}
+        boolean biDirectEating = false;
+
+        if (biDirectEating || owner == PlayerType.PLAYER_ONE){
+            if (targetXCoord == xCoord - 2 && targetYCoord == yCoord + 2) {intermediumXCoord -= 1; intermediumYCoord += 1;}
+            if (targetXCoord == xCoord - 2 && targetYCoord == yCoord - 2) {intermediumXCoord -= 1; intermediumYCoord -= 1;}
+        }
+        if (biDirectEating || owner == PlayerType.PLAYER_TWO){
+            if (targetXCoord == xCoord + 2 && targetYCoord == yCoord + 2) {intermediumXCoord += 1; intermediumYCoord += 1;}
+            if (targetXCoord == xCoord + 2 && targetYCoord == yCoord - 2) {intermediumXCoord += 1; intermediumYCoord -= 1;}
+        }
 
         SquareField squareField = CheckersTheGame.instance.getSquareField(intermediumXCoord,intermediumYCoord);
-        if (squareField != null && squareField.getPiece().getOwner() != this.getOwner()){
+        if (squareField != null && squareField.hasPiece() && squareField.getPiece().getOwner() != this.getOwner()){
             return new MoveAttempt(MoveAttempt.Direction.KILL).setIntermedium(squareField.getPiece());
         }
         return new MoveAttempt(MoveAttempt.Direction.UNAVAILABLE);

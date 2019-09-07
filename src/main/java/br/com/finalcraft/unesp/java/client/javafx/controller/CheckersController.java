@@ -3,6 +3,7 @@ package br.com.finalcraft.unesp.java.client.javafx.controller;
 import br.com.finalcraft.unesp.java.common.application.CheckersTheGame;
 import br.com.finalcraft.unesp.java.common.application.render.CheckersRender;
 import br.com.finalcraft.unesp.java.common.application.render.data.PieceStackPane;
+import br.com.finalcraft.unesp.java.common.consoleview.ConsoleView;
 import br.com.finalcraft.unesp.java.main.JavaFXMain;
 import br.com.finalcraft.unesp.java.main.javafx.view.MyFXMLs;
 import com.jfoenix.controls.JFXSlider;
@@ -113,6 +114,7 @@ public class CheckersController {
         JavaFXMain.thePrimaryStage.show();
 
         JavaFXMain.thePrimaryStage.setScene(scene = new Scene(MyFXMLs.loadCheckers()));
+        //ConsoleView.initialize();
     }
 
     private JFXSlider slidingScale;

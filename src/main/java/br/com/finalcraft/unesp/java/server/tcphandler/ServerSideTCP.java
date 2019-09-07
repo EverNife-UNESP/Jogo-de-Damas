@@ -5,11 +5,15 @@ import java.net.Socket;
 
 public class ServerSideTCP extends Thread {
 
-    public static ServerSideTCP serverSide;
-    public static ServerSocketThread serverSocketThread;
+    private static ServerSideTCP serverSide;
+    private static ServerSocketThread serverSocketThread;
 
     public static boolean isConnected(){
         return serverSocketThread == null ? false : serverSocketThread.isAlive();
+    }
+
+    public static ServerSocketThread getClient(){
+        return serverSocketThread;
     }
 
     public static void initialize(int porta){

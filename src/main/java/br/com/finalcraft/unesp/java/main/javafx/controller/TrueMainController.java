@@ -2,6 +2,7 @@ package br.com.finalcraft.unesp.java.main.javafx.controller;
 
 import br.com.finalcraft.unesp.java.client.javafx.controller.CheckersController;
 import br.com.finalcraft.unesp.java.client.javafx.controller.ClientController;
+import br.com.finalcraft.unesp.java.common.application.CheckersTheGame;
 import br.com.finalcraft.unesp.java.common.application.data.enums.PlayerType;
 import br.com.finalcraft.unesp.java.main.JavaFXMain;
 import br.com.finalcraft.unesp.java.server.javafx.controller.ServerController;
@@ -9,6 +10,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 
+import java.awt.event.ActionEvent;
 import java.util.Random;
 
 public class TrueMainController {
@@ -52,8 +54,14 @@ public class TrueMainController {
     void onProcurarPartida() {
         checkIfNameWasChanged();
         playerType = PlayerType.PLAYER_TWO;
+        ClientController.show();
+    }
 
+    @FXML
+    void onJogarSolo() {
+        checkIfNameWasChanged();
+        playerType = PlayerType.PLAYER_ONE;
+        CheckersTheGame.instance.isSinglePlayer = true;
         CheckersController.show();
-        //ClientController.show();
     }
 }

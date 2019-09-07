@@ -33,28 +33,39 @@
                      <columnConstraints>
                         <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                         <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                        <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                      </columnConstraints>
                      <rowConstraints>
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                         <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
                      </rowConstraints>
                      <children>
-                        <JFXButton alignment="CENTER" buttonType="RAISED" onAction="#onProcurarPartida" prefHeight="40.0" prefWidth="132.0" ripplerFill="#0ed10d" style="-fx-background-color: #00ff00;" text="Procurar Partida" textAlignment="CENTER" GridPane.halignment="CENTER">
+                        <JFXButton alignment="CENTER" buttonType="RAISED" onAction="#onProcurarPartida" prefHeight="40.0" prefWidth="132.0" ripplerFill="#0ed10d" style="-fx-background-color: #00ff00;" text="Procurar Partida" textAlignment="CENTER" GridPane.columnIndex="1" GridPane.halignment="CENTER">
                            <font>
                               <Font name="System Bold" size="13.0" />
                            </font>
                         </JFXButton>
-                        <Label alignment="CENTER" prefHeight="50.0" prefWidth="279.0" text="Procurar partida de outros jogadores" GridPane.rowIndex="1">
+                        <Label alignment="CENTER" prefHeight="50.0" prefWidth="279.0" text="Procurar oponente" GridPane.columnIndex="1" GridPane.rowIndex="1">
                            <font>
                               <Font size="14.0" />
                            </font>
                         </Label>
-                        <JFXButton alignment="CENTER" buttonType="RAISED" contentDisplay="CENTER" onAction="#onHospedarPartida" prefHeight="40.0" prefWidth="132.0" ripplerFill="#0ed10d" style="-fx-background-color: #3498db;" text="Hosperdar Partida" textAlignment="CENTER" GridPane.columnIndex="1" GridPane.halignment="CENTER">
+                        <JFXButton alignment="CENTER" buttonType="RAISED" contentDisplay="CENTER" onAction="#onHospedarPartida" prefHeight="40.0" prefWidth="132.0" ripplerFill="#0ed10d" style="-fx-background-color: #3498db;" text="Hosperdar Partida" textAlignment="CENTER" GridPane.columnIndex="2" GridPane.halignment="CENTER">
                            <font>
                               <Font name="System Bold" size="13.0" />
                            </font>
                         </JFXButton>
-                        <Label alignment="CENTER" prefHeight="35.0" prefWidth="220.0" text="Criar uma Partida" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                        <Label alignment="CENTER" prefHeight="35.0" prefWidth="220.0" text="Criar uma Partida" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <JFXButton alignment="CENTER" buttonType="RAISED" onAction="#onJogarSolo" prefHeight="40.0" prefWidth="132.0" ripplerFill="#2f832e" style="-fx-background-color: #ff00ff;" text="Jogador Solo" textAlignment="CENTER">
+                           <font>
+                              <Font name="System Bold" size="13.0" />
+                           </font>
+                        </JFXButton>
+                        <Label alignment="CENTER" prefHeight="50.0" prefWidth="279.0" text="Jogador Sozinho" GridPane.rowIndex="1">
                            <font>
                               <Font size="14.0" />
                            </font>
