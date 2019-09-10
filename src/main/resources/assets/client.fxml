@@ -8,7 +8,7 @@
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.finalcraft.unesp.java.client.javafx.controller.ClientController">
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.finalcraft.unesp.java.jogodamas.client.javafx.controller.ClientController">
    <center>
       <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="356.0" prefWidth="517.0" style="-fx-background-color: #ecf0f1;" BorderPane.alignment="CENTER">
          <children>

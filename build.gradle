@@ -42,7 +42,7 @@ shadowJar {
     }
     archiveName = "${baseName}-${version}.jar"
     manifest {
-        attributes 'Main-Class': 'br.com.finalcraft.unesp.java.atividades.JavaFXMain'
+        attributes 'Main-Class': 'br.com.finalcraft.unesp.java.jogodamas.main.JavaFXMain'
     }
 }
 

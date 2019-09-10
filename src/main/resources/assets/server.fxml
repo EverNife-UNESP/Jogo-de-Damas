@@ -12,7 +12,7 @@
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="376.0" prefWidth="511.0" style="-fx-background-color: #ecf0f1;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.finalcraft.unesp.java.server.javafx.controller.ServerController">
+<BorderPane prefHeight="376.0" prefWidth="511.0" style="-fx-background-color: #ecf0f1;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.finalcraft.unesp.java.jogodamas.server.javafx.controller.ServerController">
    <top>
       <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="411.0" prefWidth="517.0" style="-fx-background-color: #ecf0f1;" BorderPane.alignment="CENTER">
          <children>
