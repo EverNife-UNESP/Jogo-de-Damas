@@ -48,26 +48,30 @@ public class ConsoleView extends BorderPane {
     }
 
     public static void initialize(){
-        new Thread(){
-            @Override
-            public void run() {
-                Platform.runLater(() -> {
-                    ConsoleView console = new ConsoleView();
-                    Scene consoleScene = new Scene(console);
-                    URL url = MyFXMLs.getConsoleCSS();
-                    if (url != null) consoleScene.getStylesheets().add(url.toString());
+        if (dialog != null){
+            dialog.show();
+        }else {
+            new Thread(){
+                @Override
+                public void run() {
+                    Platform.runLater(() -> {
+                        ConsoleView console = new ConsoleView();
+                        Scene consoleScene = new Scene(console);
+                        URL url = MyFXMLs.getConsoleCSS();
+                        if (url != null) consoleScene.getStylesheets().add(url.toString());
 
-                    System.setOut(console.getOut());
-                    System.setIn(console.getIn());
-                    System.setErr(console.getOut());
+                        System.setOut(console.getOut());
+                        System.setIn(console.getIn());
+                        System.setErr(console.getOut());
 
-                    dialog = new Stage();
-                    dialog.initOwner(JavaFXMain.thePrimaryStage);
-                    dialog.setScene(consoleScene);
-                    dialog.show();
-                });
-            }
-        }.start();
+                        dialog = new Stage();
+                        dialog.initOwner(JavaFXMain.thePrimaryStage);
+                        dialog.setScene(consoleScene);
+                        dialog.show();
+                    });
+                }
+            }.start();
+        }
     }
 
     public ConsoleView() {

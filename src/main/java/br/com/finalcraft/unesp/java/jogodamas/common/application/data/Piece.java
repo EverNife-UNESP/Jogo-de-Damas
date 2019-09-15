@@ -40,10 +40,7 @@ public class Piece implements Serializable {
 
         int xDislock = targetXCoord - xCoord;
         int yDislock = targetYCoord - yCoord;
-
-        System.out.println();
-        System.out.println(target);
-
+        
         SmartLogger.debugLogical("Origin: " + getSquareField());
         SmartLogger.debugLogical("Target: " + target);
         SmartLogger.debugLogical("Resulting --> xDislock: " + xDislock);

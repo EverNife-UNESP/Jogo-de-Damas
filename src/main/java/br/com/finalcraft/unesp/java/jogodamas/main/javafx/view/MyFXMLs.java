@@ -24,6 +24,10 @@ public class MyFXMLs {
         return loadFXML("/assets/client.fxml");
     }
 
+    public static Parent loadDebug(){
+        return loadFXML("/assets/debug.fxml");
+    }
+
     public static URL getConsoleCSS(){
         return MyFXMLs.class.getResource("/assets/main/console-style.css");
     }

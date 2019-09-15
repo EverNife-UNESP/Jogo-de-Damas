@@ -4,6 +4,7 @@ import br.com.finalcraft.unesp.java.jogodamas.common.Sleeper;
 import br.com.finalcraft.unesp.java.jogodamas.common.application.CheckersTheGame;
 import br.com.finalcraft.unesp.java.jogodamas.common.application.render.CheckersRender;
 import br.com.finalcraft.unesp.java.jogodamas.common.application.render.data.PieceStackPane;
+import br.com.finalcraft.unesp.java.jogodamas.common.consoleview.ConsoleView;
 import br.com.finalcraft.unesp.java.jogodamas.main.JavaFXMain;
 import br.com.finalcraft.unesp.java.jogodamas.main.javafx.view.MyFXMLs;
 import com.jfoenix.controls.JFXSlider;
@@ -153,6 +154,17 @@ public class CheckersController {
 
     @FXML
     private GridPane gripPane;
+
+    @FXML
+    void onDebug() {
+        DebuggerController.show();
+    }
+
+    @FXML
+    void onConsole() {
+        ConsoleView.initialize();
+    }
+
 
     @FXML
     void onDesistir() {

@@ -31,11 +31,32 @@
    <left>
       <VBox fx:id="sideBar" prefWidth="125.0" style="-fx-background-color: #303030;" BorderPane.alignment="CENTER">
          <children>
-            <JFXButton onAction="#onDesistir" prefHeight="84.0" prefWidth="159.0" text="Desistir" textFill="WHITE">
+            <JFXButton contentDisplay="TOP" onAction="#onDesistir" prefHeight="84.0" prefWidth="159.0" text="Desistir" textFill="WHITE">
                <graphic>
                   <ImageView fitHeight="64.0" fitWidth="64.0" pickOnBounds="true">
                      <image>
                         <Image url="@client/icons/surrender.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </JFXButton>
+            <JFXButton contentDisplay="TOP" onAction="#onDebug" prefHeight="84.0" prefWidth="159.0" text="Debug Settings" textFill="WHITE">
+               <graphic>
+                  <ImageView fitHeight="64.0" fitWidth="64.0" pickOnBounds="true">
+                     <image>
+                        <Image url="@client/icons/settings.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+               <padding>
+                  <Insets top="50.0" />
+               </padding>
+            </JFXButton>
+            <JFXButton contentDisplay="TOP" onAction="#onConsole" prefHeight="84.0" prefWidth="159.0" text="Console" textFill="WHITE">
+               <graphic>
+                  <ImageView fitHeight="64.0" fitWidth="64.0" pickOnBounds="true">
+                     <image>
+                        <Image url="@client/icons/console.png" />
                      </image>
                   </ImageView>
                </graphic>
