@@ -3,7 +3,7 @@ package br.com.finalcraft.unesp.java.jogodamas.common;
 public class SmartLogger {
 
     public static boolean DEBUG_RENDER = false;
-    public static boolean DEBUG_LOGICAL = true;
+    public static boolean DEBUG_LOGICAL = false;
 
     public static void info(String message){
         System.out.println(message);

@@ -47,6 +47,10 @@ public class CheckersTheGame implements Serializable {
         return consecutiveKilling;
     }
 
+    public boolean isMyTurn(){
+        return TrueMainController.playerType == playersTurn;
+    }
+
     public boolean isMyTurn(Piece piece){
         if (isSinglePlayer){
             return piece.getOwner() == playersTurn;
@@ -68,14 +72,32 @@ public class CheckersTheGame implements Serializable {
         }
         consecutiveKilling = playAgain;
 
-        if (playersTurn == PlayerType.PLAYER_ONE){
-            if (!playAgain) instance.playersTurn = PlayerType.PLAYER_TWO;
-            if (!isSinglePlayer) ServerSideTCP.getClient().sendToClient(new TCPMessage.CheckersTable(instance, TCPMessageDirection.CLIENT_TO_SERVER));
-        }else {
-            if (!playAgain) instance.playersTurn = PlayerType.PLAYER_ONE;
-            if (!isSinglePlayer) ClientSideTCP.sendToServer(new TCPMessage.CheckersTable(instance, TCPMessageDirection.CLIENT_TO_SERVER));
+        if (!playAgain){
+            switchPlayerTurn();
         }
+
         refreshGameRenderAndLogic();
+
+        if (!isSinglePlayer){
+            enforceGameSync();
+        }
+
+    }
+
+    public void switchPlayerTurn(){
+        if (playersTurn == PlayerType.PLAYER_ONE){
+            instance.playersTurn = PlayerType.PLAYER_TWO;
+        }else {
+            instance.playersTurn = PlayerType.PLAYER_ONE;
+        }
+    }
+
+    public void enforceGameSync(){
+        if (TrueMainController.playerType == PlayerType.PLAYER_ONE){
+            ServerSideTCP.getClient().sendToClient(new TCPMessage.CheckersTable(instance, TCPMessageDirection.SERVER_TO_CLIENT));
+        }else {
+            ClientSideTCP.sendToServer(new TCPMessage.CheckersTable(instance, TCPMessageDirection.CLIENT_TO_SERVER));
+        }
     }
 
     public PlayerType checkForGameEnding(){
@@ -105,15 +127,14 @@ public class CheckersTheGame implements Serializable {
         return gameWinner != null && gameWinner == TrueMainController.playerType;
     }
 
-    public void refreshGameRenderAndLogic(){
+    public synchronized void refreshGameRenderAndLogic(){
         //Game Logic
-        calculateObligatedMoves();
+        if (isMyTurn()) calculateObligatedMoves();
 
         //Game Render
         Platform.runLater(() -> {
             CheckersController.instance.updateCheckersTable();
         });
-
 
         if (checkForGameEnding() != null){
             CheckersController.instance.onGameEnd();
@@ -182,6 +203,8 @@ public class CheckersTheGame implements Serializable {
 
     //Most inefficient way to do this, but.... i don't care :/
     public List<MoveAttempt> checkForAssassination(Piece piece){
+        boolean temporaryValue = SmartLogger.DEBUG_LOGICAL;
+        SmartLogger.DEBUG_LOGICAL = false;
         List<MoveAttempt> moveAttemptList = new ArrayList<MoveAttempt>();
         for (SquareField squareField : allSquareFields) {
             if (squareField.isValid()){
@@ -191,6 +214,7 @@ public class CheckersTheGame implements Serializable {
                 }
             }
         }
+        SmartLogger.DEBUG_LOGICAL = temporaryValue;
         return moveAttemptList;
     }
 
@@ -228,5 +252,23 @@ public class CheckersTheGame implements Serializable {
     }
 
 
-
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder("\n");
+        for (int i = 0; i < tabuleiro.length; i++) {
+            for (int j = 0; j < tabuleiro[i].length; j++) {
+                if (!tabuleiro[i][j].isValid()){
+                    stringBuilder.append(String.format("%1$4s", -1));
+                }else {
+                    if (!tabuleiro[i][j].hasPiece()){
+                        stringBuilder.append(String.format("%1$4s", 0));
+                    }else {
+                        stringBuilder.append(String.format("%1$4s", (tabuleiro[i][j].getPiece().getOwner() == PlayerType.PLAYER_ONE ? 1 : 2)));
+                    }
+                }
+            }
+            stringBuilder.append("\n");
+        }
+        return stringBuilder.toString();
+    }
 }

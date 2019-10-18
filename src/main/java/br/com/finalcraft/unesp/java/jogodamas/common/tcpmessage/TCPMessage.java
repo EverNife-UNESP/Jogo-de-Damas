@@ -26,7 +26,7 @@ public abstract class TCPMessage implements Serializable {
 
         @Override
         public String toString() {
-            return "[" + direction + " - The Entire GameBoard]";
+            return "[" + direction + " - The Entire GameBoard: " + theTable + "]";
         }
     }
 

@@ -1,5 +1,7 @@
 package br.com.finalcraft.unesp.java.jogodamas.client.tcp;
 
+import br.com.finalcraft.evernifecore.cooldown.FCTimeFrame;
+import br.com.finalcraft.unesp.java.jogodamas.client.javafx.controller.CheckersController;
 import br.com.finalcraft.unesp.java.jogodamas.common.application.CheckersTheGame;
 import br.com.finalcraft.unesp.java.jogodamas.common.tcpmessage.TCPMessage;
 
@@ -27,7 +29,7 @@ public class ClientSideTCP extends Thread {
     public static void initialize(String ip, int port){
         if (isConnected()) System.out.println("Você já está conectado!");
 
-        System.out.println("Iniciando CLIENT_SIDE_TCP (Targeting \"" + ip + ":" + port + "\")");
+        info("Iniciando CLIENT_SIDE_TCP (Targeting \"" + ip + ":" + port + "\")");
 
         clientSide = new ClientSideTCP(ip,port);
         if (clientSide.connect()){
@@ -37,9 +39,15 @@ public class ClientSideTCP extends Thread {
     }
 
     public static void sendToServer(TCPMessage tcpMessage){
-        System.out.println("Sending TCPMessage." + tcpMessage.getClass().getSimpleName() + " to server: " + tcpMessage.toString());
+        info("Sending TCPMessage." + tcpMessage.getClass().getSimpleName() + " to server: " + tcpMessage.toString());
         try {
             clientSide.objectOutputStream.flush();
+            clientSide.objectOutputStream.reset();
+                //Se nao tiver essa merda aqui, por estar enviando o mesmo objeto,
+                // ele pensar que o objeto não foi alterado e por essa razão no lado
+                // receptor ele lê o mesmo objeto;;; resumindo, bug do java nojento.
+                // Mais informações aqui
+                // https://stackoverflow.com/questions/8089583/why-is-javas-object-stream-returning-the-same-object-each-time-i-call-readobjec
             clientSide.objectOutputStream.writeObject(tcpMessage);
         }catch (Exception e){
             e.printStackTrace();
@@ -50,10 +58,14 @@ public class ClientSideTCP extends Thread {
         System.out.println("Waiting TCPMessage from server...");
         Object readObject = clientSide.objectInputStream.readObject();
         if (readObject instanceof TCPMessage){
-            System.out.println("Received TCPMessage." + readObject.getClass().getSimpleName() + " from Server: " + readObject.toString());
+            info( "Received TCPMessage." + readObject.getClass().getSimpleName() + " from Server: " + readObject.toString());
             return (TCPMessage) readObject;
         }
         return null;
+    }
+
+    public static void info(String msg){
+        System.out.println( "\n[" + new FCTimeFrame().getFormated() + "]"+ msg);
     }
 
 
@@ -68,11 +80,11 @@ public class ClientSideTCP extends Thread {
             objectOutputStream = new ObjectOutputStream(serverSocket.getOutputStream());
             objectInputStream = new ObjectInputStream(serverSocket.getInputStream());
 
-            System.out.println("Conectando ao servidor [" + serverSocket.getInetAddress().getHostAddress() + "]");
+            info("Conectando ao servidor [" + serverSocket.getInetAddress().getHostAddress() + "]");
             System.out.println("\n\n");
             return true;
         }catch(Exception e) {
-            System.out.println("Erro: " + e.getMessage());
+            info("Erro: " + e.getMessage());
         }
         return false;
     }
@@ -85,17 +97,18 @@ public class ClientSideTCP extends Thread {
                     TCPMessage tcpMessage = readFromServer();
                     handleTCPMessage(tcpMessage);
                 } catch(SocketException e) {
-                    System.out.println("Erro: ");
+                    info("Erro: ");
                     e.printStackTrace();
+                    CheckersController.instance.onGameForcedEnd();
                     break;  //Fechar conexão (no caso, finalizar a thread)
                 }
                 catch(Exception e) {
-                    System.out.println("Erro: ");
+                    info("Erro: ");
                     e.printStackTrace();
                 }
             }
         }catch(Exception e) {
-            System.out.println("Erro: " + e.getMessage());
+            info("Erro: " + e.getMessage());
         }
     }
 

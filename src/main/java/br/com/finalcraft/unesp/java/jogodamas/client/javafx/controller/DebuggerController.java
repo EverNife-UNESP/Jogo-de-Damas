@@ -28,14 +28,6 @@ public class DebuggerController {
 
             Scene newSceneWindow = new Scene(MyFXMLs.loadDebug());
             stage.setScene(newSceneWindow);
-            stage.setOnShowing(event -> {
-                if (SmartLogger.DEBUG_LOGICAL) instance.debugLogical.setSelected(true);
-                if (SmartLogger.DEBUG_RENDER) instance.debugRender.setSelected(true);
-            });
-            stage.setOnCloseRequest(event -> {
-                if (instance.debugLogical.isSelected()) SmartLogger.DEBUG_LOGICAL = true;
-                if (instance.debugRender.isSelected()) SmartLogger.DEBUG_RENDER = true;
-            });
 
             instance.borderPane.setOnMousePressed(event -> {
                 instance.x = event.getSceneX();
@@ -48,6 +40,8 @@ public class DebuggerController {
             });
         }
 
+        instance.debugLogical.setSelected(SmartLogger.DEBUG_LOGICAL);
+        instance.debugRender.setSelected(SmartLogger.DEBUG_RENDER);
         stage.show();
     }
 
@@ -70,5 +64,7 @@ public class DebuggerController {
     @FXML
     void onClose() {
         stage.hide();
+        SmartLogger.DEBUG_LOGICAL = instance.debugLogical.isSelected();
+        SmartLogger.DEBUG_RENDER = instance.debugRender.isSelected();
     }
 }

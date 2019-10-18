@@ -51,25 +51,25 @@ public class CheckersController {
             //Render da pessa em si
             if (squareField.hasPiece()){
                 PieceStackPane stackPane = CheckersRender.createRender(squareField.getPiece());
-
                 gripPane.getChildren().add(stackPane);
             }
-
         });
 
-        CheckersTheGame.instance.getObligatedMoves().forEach(moveAttempt -> {
-            if (CheckersTheGame.instance.isMyTurn(moveAttempt.getActorPiece())){
-                SquareRectangle squareRectangle;
-                //Origin
-                squareRectangle = mapOfSquareFieldToRectangles.get(moveAttempt.getActorPiece().getSquareField());
-                if (squareRectangle.getFill() != Color.DARKGREEN) squareRectangle.setFill(Color.DARKGREEN);
+        if (CheckersTheGame.instance.isMyTurn()){
+            CheckersTheGame.instance.getObligatedMoves().forEach(moveAttempt -> {
+                if (CheckersTheGame.instance.isMyTurn(moveAttempt.getActorPiece())){
+                    SquareRectangle squareRectangle;
+                    //Origin
+                    squareRectangle = mapOfSquareFieldToRectangles.get(moveAttempt.getActorPiece().getSquareField());
+                    if (squareRectangle.getFill() != Color.DARKGREEN) squareRectangle.setFill(Color.DARKGREEN);
 
-                //Target
-                squareRectangle = mapOfSquareFieldToRectangles.get(moveAttempt.getTargetField());
-                if (squareRectangle.getFill() != Color.LIGHTGREEN) squareRectangle.setFill(Color.LIGHTGREEN);
+                    //Target
+                    squareRectangle = mapOfSquareFieldToRectangles.get(moveAttempt.getTargetField());
+                    if (squareRectangle.getFill() != Color.LIGHTGREEN) squareRectangle.setFill(Color.LIGHTGREEN);
 
-            }
-        });
+                }
+            });
+        }
     }
 
 
@@ -197,6 +197,18 @@ public class CheckersController {
         alert.setContentText(frasesMotivacionais[(new Random().nextInt(frasesMotivacionais.length))]);
         Optional<ButtonType> result = alert.showAndWait();
         if (result.get() == ButtonType.OK){
+            onClose();
+        }
+    }
+
+    public void onGameForcedEnd(){
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Você venceu o jogo pois seu adversário saiu da partida!");
+        alert.setHeaderText("O programa será encerrado! Forte abraço :D");
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == ButtonType.OK){
+            onClose();
+        }else {
             onClose();
         }
     }
