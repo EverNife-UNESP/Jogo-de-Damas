@@ -2,13 +2,14 @@ package br.com.finalcraft.unesp.java.jogodamas.client.javafx.controller;
 
 import br.com.finalcraft.unesp.java.jogodamas.common.Sleeper;
 import br.com.finalcraft.unesp.java.jogodamas.common.application.CheckersTheGame;
+import br.com.finalcraft.unesp.java.jogodamas.common.application.data.SquareField;
 import br.com.finalcraft.unesp.java.jogodamas.common.application.render.CheckersRender;
 import br.com.finalcraft.unesp.java.jogodamas.common.application.render.data.PieceStackPane;
+import br.com.finalcraft.unesp.java.jogodamas.common.application.render.data.SquareRectangle;
 import br.com.finalcraft.unesp.java.jogodamas.common.consoleview.ConsoleView;
 import br.com.finalcraft.unesp.java.jogodamas.main.JavaFXMain;
 import br.com.finalcraft.unesp.java.jogodamas.main.javafx.view.MyFXMLs;
 import com.jfoenix.controls.JFXSlider;
-import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
@@ -17,10 +18,12 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
-import javafx.scene.shape.Rectangle;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
@@ -33,10 +36,13 @@ public class CheckersController {
 
         gripPane.getChildren().clear();
 
+        HashMap<SquareField, SquareRectangle> mapOfSquareFieldToRectangles = new HashMap<SquareField, SquareRectangle>();
+
         CheckersTheGame.instance.allSquareFields.forEach(squareField -> {
             //Render do background
-            Rectangle rectangle = CheckersRender.createRender(squareField);
+            SquareRectangle rectangle = CheckersRender.createRender(squareField);
             gripPane.getChildren().add(rectangle);
+            mapOfSquareFieldToRectangles.put(squareField,rectangle);
         });
 
         CheckersTheGame.instance.allSquareFields.forEach(squareField -> {
@@ -48,7 +54,22 @@ public class CheckersController {
             }
 
         });
+
+        CheckersTheGame.instance.checkForObligatedMoves().forEach(moveAttempt -> {
+            if (CheckersTheGame.instance.isMyTurn(moveAttempt.getActorPiece())){
+                SquareRectangle squareRectangle;
+                //Origin
+                squareRectangle = mapOfSquareFieldToRectangles.get(moveAttempt.getActorPiece().getSquareField());
+                if (squareRectangle.getFill() != Color.DARKGREEN) squareRectangle.setFill(Color.DARKGREEN);
+
+                //Target
+                squareRectangle = mapOfSquareFieldToRectangles.get(moveAttempt.getTargetField());
+                if (squareRectangle.getFill() != Color.LIGHTGREEN) squareRectangle.setFill(Color.LIGHTGREEN);
+
+            }
+        });
     }
+
 
     double x;
     double y;

@@ -32,6 +32,7 @@ public class Piece implements Serializable {
     }
 
     public MoveAttempt canMoveTo(SquareField target){
+
         int xCoord = this.pieceSquareField.getXCoord();
         int yCoord = this.pieceSquareField.getYCoord();
 
@@ -40,7 +41,8 @@ public class Piece implements Serializable {
 
         int xDislock = targetXCoord - xCoord;
         int yDislock = targetYCoord - yCoord;
-        
+
+        SmartLogger.debugLogical("\n\n");
         SmartLogger.debugLogical("Origin: " + getSquareField());
         SmartLogger.debugLogical("Target: " + target);
         SmartLogger.debugLogical("Resulting --> xDislock: " + xDislock);
@@ -50,27 +52,38 @@ public class Piece implements Serializable {
         boolean canMoveUpwards      = this.getOwner() == PlayerType.PLAYER_ONE;
         boolean canBidirectMove     = isDama;
 
-        if (Math.abs(xDislock) != Math.abs(yDislock)){          //Fora das cores e/ou direções válidas!
+        MoveAttempt moveAttempt = new MoveAttempt(this,target);
+
+        int absDistance = Math.abs(xDislock);//Tanto faz xDislock ou yDislock... pq sao iguais
+
+        if (absDistance == 0) {              //Nela mesma
+            return moveAttempt.setDirection(MoveAttempt.Direction.OVER_PIECE);
+        }
+
+        if (target.hasPiece()) {                            //Em cima de outra peça
+            return moveAttempt.setDirection(MoveAttempt.Direction.OVER_PIECE);
+        }
+
+        if (Math.abs(xDislock) != Math.abs(yDislock) || !target.isValid()){          //Fora das cores e/ou direções válidas!
             SmartLogger.debugLogical("Out of field (Diagonal)");
-            return new MoveAttempt(MoveAttempt.Direction.UNAVAILABLE);
+            return moveAttempt.setDirection(MoveAttempt.Direction.UNAVAILABLE);
         }
 
         if (this.getSquareField() == target){                           //Mover nele mesmo :/
             SmartLogger.debugLogical("Self move");
-            return new MoveAttempt(MoveAttempt.Direction.UNAVAILABLE);
+            return moveAttempt.setDirection(MoveAttempt.Direction.UNAVAILABLE);
         }
 
         if (!canBidirectMove && !canMoveDownwards && xDislock > 0){     //Não pode ir para baixo
             SmartLogger.debugLogical("Cant move downwards");
-            return new MoveAttempt(MoveAttempt.Direction.UNAVAILABLE);
+            return moveAttempt.setDirection(MoveAttempt.Direction.UNAVAILABLE);
         }
 
         if (!canBidirectMove && !canMoveUpwards && xDislock < 0){     //Não pode ir para cima
             SmartLogger.debugLogical("Cant move upwards");
-            return new MoveAttempt(MoveAttempt.Direction.UNAVAILABLE);
+            return moveAttempt.setDirection(MoveAttempt.Direction.UNAVAILABLE);
         }
 
-        int absDistance = Math.abs(xDislock);//Tanto faz xDislock ou yDislock... pq sao iguais
 
         List<SquareField> squareFieldsBetweenFields = new ArrayList<>();
 
@@ -92,25 +105,28 @@ public class Piece implements Serializable {
         if (!hasAnyPieceBetween){   //Caso não tenha ninguem para ser comido!
             if (absDistance == 1){
                 SmartLogger.debugLogical("SimpleMoveFound");
-                return new MoveAttempt(MoveAttempt.Direction.SIMPLE);
+                return moveAttempt.setDirection(MoveAttempt.Direction.SIMPLE);
             }else if (isDama){
                 SmartLogger.debugLogical("DamaMoveFound");
-                return new MoveAttempt(MoveAttempt.Direction.SIMPLE);
+                return moveAttempt.setDirection(MoveAttempt.Direction.SIMPLE);
             }
-            return new MoveAttempt(MoveAttempt.Direction.UNAVAILABLE);
+            return moveAttempt.setDirection(MoveAttempt.Direction.UNAVAILABLE);
         }
 
         if (piecesBetween == 1){
             Piece killedPiece = squareFieldsBetweenFields.stream().filter(squareField -> squareField.hasPiece()).findFirst().get().getPiece();
+            if (killedPiece.getOwner() == this.getOwner()){
+                return moveAttempt.setDirection(MoveAttempt.Direction.FRIEND_FIRE).setKilledPiece(killedPiece);
+            }
             if (absDistance == 2){
                 SmartLogger.debugLogical("SimpleEatFound");
-                return new MoveAttempt(MoveAttempt.Direction.KILL).setKilledPiece(killedPiece);
+                return moveAttempt.setDirection(MoveAttempt.Direction.KILL).setKilledPiece(killedPiece);
             }else if (absDistance > 2 && isDama){
                 SmartLogger.debugLogical("DamaEatFound");
-                return new MoveAttempt(MoveAttempt.Direction.KILL).setKilledPiece(killedPiece);
+                return moveAttempt.setDirection(MoveAttempt.Direction.KILL).setKilledPiece(killedPiece);
             }
         }
-        return new MoveAttempt(MoveAttempt.Direction.UNAVAILABLE);
+        return moveAttempt.setDirection(MoveAttempt.Direction.UNAVAILABLE);
 
 
         /*
