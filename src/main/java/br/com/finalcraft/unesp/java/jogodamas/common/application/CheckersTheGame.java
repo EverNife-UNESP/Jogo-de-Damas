@@ -117,6 +117,19 @@ public class CheckersTheGame implements Serializable {
 
         if (p1Pieces == 0) return gameWinner = PlayerType.PLAYER_TWO;    //Se nao tem mais peças do jogador 1, logo, jogador 2 venceu!
         if (p2Pieces == 0) return gameWinner = PlayerType.PLAYER_ONE;    //Se nao tem mais peças do jogador 2, logo, jogador 1 venceu!
+
+        boolean loseForStuckness = true;
+        for (SquareField squareField : allSquareFields) {
+            if (squareField.isValid() && squareField.hasPiece() && squareField.getPiece().getOwner() == playersTurn){
+                if (checkForPossibleMoves(squareField.getPiece()).size() > 0){
+                    loseForStuckness = false;
+                    break;
+                }
+            }
+        }
+
+        if (loseForStuckness) return gameWinner = playersTurn.getOpponent();
+
         return gameWinner = null;
     }
 
@@ -129,7 +142,7 @@ public class CheckersTheGame implements Serializable {
 
     public synchronized void refreshGameRenderAndLogic(){
         //Game Logic
-        if (isMyTurn()) calculateObligatedMoves();
+        calculateObligatedMoves();
 
         //Game Render
         Platform.runLater(() -> {
@@ -210,6 +223,23 @@ public class CheckersTheGame implements Serializable {
             if (squareField.isValid()){
                 MoveAttempt moveAttempt = piece.canMoveTo(squareField);
                 if (moveAttempt.getDirection() == MoveAttempt.Direction.KILL && moveAttempt.getKilledPiece() != null){
+                    moveAttemptList.add(moveAttempt);
+                }
+            }
+        }
+        SmartLogger.DEBUG_LOGICAL = temporaryValue;
+        return moveAttemptList;
+    }
+
+    //Most inefficient way to do this, but.... i don't care :/
+    public List<MoveAttempt> checkForPossibleMoves(Piece piece){
+        boolean temporaryValue = SmartLogger.DEBUG_LOGICAL;
+        SmartLogger.DEBUG_LOGICAL = false;
+        List<MoveAttempt> moveAttemptList = new ArrayList<MoveAttempt>();
+        for (SquareField squareField : allSquareFields) {
+            if (squareField.isValid()){
+                MoveAttempt moveAttempt = piece.canMoveTo(squareField);
+                if (moveAttempt.getDirection() == MoveAttempt.Direction.SIMPLE || (moveAttempt.getDirection() == MoveAttempt.Direction.KILL && moveAttempt.getKilledPiece() != null)){
                     moveAttemptList.add(moveAttempt);
                 }
             }

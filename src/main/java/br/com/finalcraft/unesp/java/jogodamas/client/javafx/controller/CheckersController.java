@@ -55,7 +55,7 @@ public class CheckersController {
             }
         });
 
-        if (CheckersTheGame.instance.isMyTurn()){
+        if (CheckersTheGame.instance.getObligatedMoves() != null){
             CheckersTheGame.instance.getObligatedMoves().forEach(moveAttempt -> {
                 if (CheckersTheGame.instance.isMyTurn(moveAttempt.getActorPiece())){
                     SquareRectangle squareRectangle;
