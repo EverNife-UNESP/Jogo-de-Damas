@@ -24,6 +24,12 @@ public class CheckersTheGame implements Serializable {
 
     public static boolean isSinglePlayer = false;
 
+    public static void startNewGame(){
+        instance = new CheckersTheGame().iniciarTabelueiro();
+        if (!isSinglePlayer) ServerSideTCP.getClient().sendToClient(new TCPMessage.CheckersTable(instance, TCPMessageDirection.CLIENT_TO_SERVER));
+        instance.refreshGameRenderAndLogic();
+    }
+
     public static void updateNewInstance(CheckersTheGame checkersTheGame){
         instance = checkersTheGame;
         instance.refreshGameRenderAndLogic();
@@ -35,6 +41,7 @@ public class CheckersTheGame implements Serializable {
     public transient List<MoveAttempt> obligatedMoves = new ArrayList<>();
     public transient MoveAttempt lastMoveAttempt = null;
     private transient boolean consecutiveKilling = false;
+    private transient PlayerType gameWinner = null;
 
     public boolean isASecondConsecutiveMove(){
         return consecutiveKilling;
@@ -61,7 +68,6 @@ public class CheckersTheGame implements Serializable {
         }
         consecutiveKilling = playAgain;
 
-
         if (playersTurn == PlayerType.PLAYER_ONE){
             if (!playAgain) instance.playersTurn = PlayerType.PLAYER_TWO;
             if (!isSinglePlayer) ServerSideTCP.getClient().sendToClient(new TCPMessage.CheckersTable(instance, TCPMessageDirection.CLIENT_TO_SERVER));
@@ -72,6 +78,33 @@ public class CheckersTheGame implements Serializable {
         refreshGameRenderAndLogic();
     }
 
+    public PlayerType checkForGameEnding(){
+        int p1Pieces = 0;
+        int p2Pieces = 0;
+
+        for (SquareField squareField : allSquareFields) {
+            if (!squareField.isValid() || !squareField.hasPiece()){
+                continue;
+            }
+            if (squareField.getPiece().getOwner() == PlayerType.PLAYER_ONE){
+                p1Pieces++;
+            }else {
+                p2Pieces++;
+            }
+        }
+
+        if (p1Pieces == 0) return gameWinner = PlayerType.PLAYER_TWO;    //Se nao tem mais peças do jogador 1, logo, jogador 2 venceu!
+        if (p2Pieces == 0) return gameWinner = PlayerType.PLAYER_ONE;    //Se nao tem mais peças do jogador 2, logo, jogador 1 venceu!
+        return gameWinner = null;
+    }
+
+    public boolean hasWinner(){
+        return gameWinner!=null;
+    }
+    public boolean iWin(){
+        return gameWinner != null && gameWinner == TrueMainController.playerType;
+    }
+
     public void refreshGameRenderAndLogic(){
         //Game Logic
         calculateObligatedMoves();
@@ -80,6 +113,13 @@ public class CheckersTheGame implements Serializable {
         Platform.runLater(() -> {
             CheckersController.instance.updateCheckersTable();
         });
+
+
+        if (checkForGameEnding() != null){
+            CheckersController.instance.onGameEnd();
+            return;
+        }
+
     }
 
     public List<MoveAttempt> getObligatedMoves() {

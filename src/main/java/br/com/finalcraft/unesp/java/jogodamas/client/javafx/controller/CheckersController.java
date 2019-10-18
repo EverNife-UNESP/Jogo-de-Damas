@@ -3,11 +3,13 @@ package br.com.finalcraft.unesp.java.jogodamas.client.javafx.controller;
 import br.com.finalcraft.unesp.java.jogodamas.common.Sleeper;
 import br.com.finalcraft.unesp.java.jogodamas.common.application.CheckersTheGame;
 import br.com.finalcraft.unesp.java.jogodamas.common.application.data.SquareField;
+import br.com.finalcraft.unesp.java.jogodamas.common.application.data.enums.PlayerType;
 import br.com.finalcraft.unesp.java.jogodamas.common.application.render.CheckersRender;
 import br.com.finalcraft.unesp.java.jogodamas.common.application.render.data.PieceStackPane;
 import br.com.finalcraft.unesp.java.jogodamas.common.application.render.data.SquareRectangle;
 import br.com.finalcraft.unesp.java.jogodamas.common.consoleview.ConsoleView;
 import br.com.finalcraft.unesp.java.jogodamas.main.JavaFXMain;
+import br.com.finalcraft.unesp.java.jogodamas.main.javafx.controller.TrueMainController;
 import br.com.finalcraft.unesp.java.jogodamas.main.javafx.view.MyFXMLs;
 import com.jfoenix.controls.JFXSlider;
 import javafx.beans.value.ChangeListener;
@@ -196,6 +198,35 @@ public class CheckersController {
         Optional<ButtonType> result = alert.showAndWait();
         if (result.get() == ButtonType.OK){
             onClose();
+        }
+    }
+
+    public void onGameEnd(){
+        if (CheckersTheGame.instance.iWin()){
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Você venceu o jogo, parabens!");
+            if (TrueMainController.playerType == PlayerType.PLAYER_ONE){
+                alert.setHeaderText("Clique em OK para começar outra partida!");
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.get() == ButtonType.OK){
+                    CheckersTheGame.startNewGame();
+                }
+            }else {
+                alert.setHeaderText("Clique em OK e espere o Host começar uma nova partida!");
+            }
+        }else {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Você perdeu miseravelmente!");
+            alert.setContentText(frasesMotivacionais[(new Random().nextInt(frasesMotivacionais.length))]);
+            if (TrueMainController.playerType == PlayerType.PLAYER_ONE){
+                alert.setHeaderText("Clique em OK para começar outra partida!");
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.get() == ButtonType.OK){
+                    CheckersTheGame.startNewGame();
+                }
+            }else {
+                alert.setHeaderText("Clique em OK e espere o Host começar uma nova partida!");
+            }
         }
     }
 
