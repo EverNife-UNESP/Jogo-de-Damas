@@ -32,8 +32,13 @@ public class CheckersTheGame implements Serializable {
     public SquareField[][] tabuleiro = new SquareField[8][8];
     public PlayerType playersTurn = null;
     public List<SquareField> allSquareFields = new ArrayList<>();
-    public List<SquareField> allValidSquareFields = new ArrayList<>();
-    public List<MoveAttempt> obligatedMoves = new ArrayList<>();
+    public transient List<MoveAttempt> obligatedMoves = new ArrayList<>();
+    public transient MoveAttempt lastMoveAttempt = null;
+    private transient boolean consecutiveKilling = false;
+
+    public boolean isASecondConsecutiveMove(){
+        return consecutiveKilling;
+    }
 
     public boolean isMyTurn(Piece piece){
         if (isSinglePlayer){
@@ -44,19 +49,32 @@ public class CheckersTheGame implements Serializable {
     }
 
     public void endMyTurn(){
-            if (playersTurn == PlayerType.PLAYER_ONE){
-                instance.playersTurn = PlayerType.PLAYER_TWO;
-                if (!isSinglePlayer) ServerSideTCP.getClient().sendToClient(new TCPMessage.CheckersTable(instance, TCPMessageDirection.CLIENT_TO_SERVER));
-            }else {
-                instance.playersTurn = PlayerType.PLAYER_ONE;
-                if (!isSinglePlayer) ClientSideTCP.sendToServer(new TCPMessage.CheckersTable(instance, TCPMessageDirection.CLIENT_TO_SERVER));
-            }
+
+        boolean playAgain = false;
+        if (lastMoveAttempt.getDirection() == MoveAttempt.Direction.KILL){
+            consecutiveKilling = true;
+            List<MoveAttempt> moveAttemptList = checkForAssassination(lastMoveAttempt.getActorPiece());
+            playAgain = moveAttemptList.size() > 0;
+        }
+        if (playAgain == false){
+            lastMoveAttempt.getActorPiece().checkForTurnIntoDama();
+        }
+        consecutiveKilling = playAgain;
+
+
+        if (playersTurn == PlayerType.PLAYER_ONE){
+            if (!playAgain) instance.playersTurn = PlayerType.PLAYER_TWO;
+            if (!isSinglePlayer) ServerSideTCP.getClient().sendToClient(new TCPMessage.CheckersTable(instance, TCPMessageDirection.CLIENT_TO_SERVER));
+        }else {
+            if (!playAgain) instance.playersTurn = PlayerType.PLAYER_ONE;
+            if (!isSinglePlayer) ClientSideTCP.sendToServer(new TCPMessage.CheckersTable(instance, TCPMessageDirection.CLIENT_TO_SERVER));
+        }
         refreshGameRenderAndLogic();
     }
 
     public void refreshGameRenderAndLogic(){
         //Game Logic
-        obligatedMoves = calculateObligatedMoves();
+        calculateObligatedMoves();
 
         //Game Render
         Platform.runLater(() -> {
@@ -68,15 +86,15 @@ public class CheckersTheGame implements Serializable {
         return obligatedMoves;
     }
 
-    private List<MoveAttempt> calculateObligatedMoves(){
-        List<MoveAttempt> obligatedMoves = new ArrayList<>();
+    private void calculateObligatedMoves(){
+        List<MoveAttempt> newObligatedMoves = new ArrayList<>();
         for (SquareField squareField : allSquareFields) {
-            if (squareField.hasPiece()){
-                obligatedMoves.addAll(checkForAssassination(squareField.getPiece()));
+            if (squareField.hasPiece() && isMyTurn(squareField.getPiece())){
+                newObligatedMoves.addAll(checkForAssassination(squareField.getPiece()));
             }
         }
-        if (SmartLogger.DEBUG_LOGICAL) obligatedMoves.forEach( moveAttempt -> SmartLogger.debugLogical(moveAttempt.toString()));
-        return obligatedMoves;
+        if (SmartLogger.DEBUG_LOGICAL) newObligatedMoves.forEach( moveAttempt -> SmartLogger.debugLogical(moveAttempt.toString()));
+        obligatedMoves = newObligatedMoves;
     }
 
     // --------------------------------------------------------------
@@ -86,9 +104,6 @@ public class CheckersTheGame implements Serializable {
             for (int j = 0; j < tabuleiro[i].length; j++) {
                 tabuleiro[i][j] = new SquareField(i,j);
                 allSquareFields.add(tabuleiro[i][j]);
-                if (tabuleiro[i][j].isValid()){
-                    allValidSquareFields.add(tabuleiro[i][j]);
-                }
             }
         }
 
@@ -128,7 +143,7 @@ public class CheckersTheGame implements Serializable {
     //Most inefficient way to do this, but.... i don't care :/
     public List<MoveAttempt> checkForAssassination(Piece piece){
         List<MoveAttempt> moveAttemptList = new ArrayList<MoveAttempt>();
-        for (SquareField squareField : allValidSquareFields) {
+        for (SquareField squareField : allSquareFields) {
             if (squareField.isValid()){
                 MoveAttempt moveAttempt = piece.canMoveTo(squareField);
                 if (moveAttempt.getDirection() == MoveAttempt.Direction.KILL && moveAttempt.getKilledPiece() != null){
@@ -160,6 +175,7 @@ public class CheckersTheGame implements Serializable {
                 moveAttempt.getKilledPiece().getSquareField().setPiece(null);
             case SIMPLE:
                 piece.moveTo(target);
+                lastMoveAttempt = moveAttempt;
                 return MoveResult.SUCESS;
 
                 //Impossible Moves Bellow

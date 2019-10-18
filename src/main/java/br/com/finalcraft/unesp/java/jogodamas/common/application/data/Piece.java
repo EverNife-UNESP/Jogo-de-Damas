@@ -50,7 +50,7 @@ public class Piece implements Serializable {
 
         boolean canMoveDownwards    = this.getOwner() == PlayerType.PLAYER_TWO;
         boolean canMoveUpwards      = this.getOwner() == PlayerType.PLAYER_ONE;
-        boolean canBidirectMove     = isDama;
+        boolean canBidirectMove     = isDama || CheckersTheGame.instance.isASecondConsecutiveMove();
 
         MoveAttempt moveAttempt = new MoveAttempt(this,target);
 
@@ -154,7 +154,6 @@ public class Piece implements Serializable {
     public void moveTo(SquareField squareField){
         this.getSquareField().setPiece(null);
         squareField.setPiece(this);
-        checkForTurnIntoDama();
     }
 
     public void checkForTurnIntoDama(){
