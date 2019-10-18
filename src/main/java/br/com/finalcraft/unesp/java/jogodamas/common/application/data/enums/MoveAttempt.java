@@ -52,6 +52,13 @@ public class MoveAttempt implements Serializable {
         FRIEND_FIRE;
     }
 
+    public boolean equals(MoveAttempt otherMove) {
+        return this.getDirection() == otherMove.getDirection()
+                && this.getActorPiece() == otherMove.getActorPiece()
+                && this.getTargetField() == otherMove.getTargetField()
+                && this.getKilledPiece() == otherMove.getKilledPiece();
+    }
+
     @Override
     public String toString() {
         return "MoveAttempt[actorPiece: " + actorPiece + ", targetField:" + targetField + "]";

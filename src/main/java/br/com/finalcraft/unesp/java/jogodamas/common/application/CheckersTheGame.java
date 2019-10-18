@@ -33,6 +33,7 @@ public class CheckersTheGame implements Serializable {
     public PlayerType playersTurn = null;
     public List<SquareField> allSquareFields = new ArrayList<>();
     public List<SquareField> allValidSquareFields = new ArrayList<>();
+    public List<MoveAttempt> obligatedMoves = new ArrayList<>();
 
     public boolean isMyTurn(Piece piece){
         if (isSinglePlayer){
@@ -54,20 +55,28 @@ public class CheckersTheGame implements Serializable {
     }
 
     public void refreshGameRenderAndLogic(){
+        //Game Logic
+        obligatedMoves = calculateObligatedMoves();
+
+        //Game Render
         Platform.runLater(() -> {
             CheckersController.instance.updateCheckersTable();
         });
     }
 
-    public List<MoveAttempt> checkForObligatedMoves(){
-        List<MoveAttempt> moveAttemptList = new ArrayList<>();
+    public List<MoveAttempt> getObligatedMoves() {
+        return obligatedMoves;
+    }
+
+    private List<MoveAttempt> calculateObligatedMoves(){
+        List<MoveAttempt> obligatedMoves = new ArrayList<>();
         for (SquareField squareField : allSquareFields) {
             if (squareField.hasPiece()){
-                moveAttemptList.addAll(checkForAssassination(squareField.getPiece()));
+                obligatedMoves.addAll(checkForAssassination(squareField.getPiece()));
             }
         }
-        if (SmartLogger.DEBUG_LOGICAL) moveAttemptList.forEach( moveAttempt -> SmartLogger.debugLogical(moveAttempt.toString()));
-        return moveAttemptList;
+        if (SmartLogger.DEBUG_LOGICAL) obligatedMoves.forEach( moveAttempt -> SmartLogger.debugLogical(moveAttempt.toString()));
+        return obligatedMoves;
     }
 
     // --------------------------------------------------------------
@@ -132,6 +141,19 @@ public class CheckersTheGame implements Serializable {
 
     public MoveResult tryToMove(Piece piece, SquareField target){
         MoveAttempt moveAttempt = piece.canMoveTo(target);
+
+        if (obligatedMoves.size() > 0){
+            boolean allowedMove = false;
+            for (MoveAttempt obligatedMove : obligatedMoves) {
+                if (obligatedMove.equals(moveAttempt)){
+                    allowedMove = true;
+                    break;
+                }
+            }
+            if (!allowedMove){
+                return MoveResult.FAIL;
+            }
+        }
 
         switch (moveAttempt.getDirection()){
             case KILL:                      //Killing Enemy
