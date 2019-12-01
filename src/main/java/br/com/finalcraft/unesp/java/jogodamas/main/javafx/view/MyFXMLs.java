@@ -24,6 +24,10 @@ public class MyFXMLs {
         return loadFXML("/assets/client.fxml");
     }
 
+    public static Parent loadSimulator(){
+        return loadFXML("/assets/simulator.fxml");
+    }
+
     public static Parent loadDebug(){
         return loadFXML("/assets/debug.fxml");
     }

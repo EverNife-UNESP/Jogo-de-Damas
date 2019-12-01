@@ -69,6 +69,11 @@ public class FCTimeFrame {
         return sdf1.format(date);
     }
 
+    public String getFormatedFullDate(){
+        Date date = new Date(millis);
+        return sdf2.format(date);
+    }
+
     public FCTimeFrame getDiferenceUntilNow(){
         return new FCTimeFrame(System.currentTimeMillis() - this.millis);
     }
@@ -90,6 +95,7 @@ public class FCTimeFrame {
     }
 
     private static SimpleDateFormat sdf1 = new SimpleDateFormat("HH:mm:ss");
+    private static SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
     public static String getFormated(Long millis){
         Date date = new Date(millis);
         return sdf1.format(date);

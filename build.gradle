@@ -34,6 +34,11 @@ repositories {
 
 dependencies {
     compile 'com.jfoenix:jfoenix:8.0.8' // Java 8
+
+    //compile "mysql:mysql-connector-java:8.0.18"
+    compile "org.mariadb.jdbc:mariadb-java-client:2.5.1" //Claramente mais rápido e menos bugado que o mysql-connector...
+
+    compile "org.mybatis:mybatis:3.4.5" //SQL script helper
 }
 
 shadowJar {

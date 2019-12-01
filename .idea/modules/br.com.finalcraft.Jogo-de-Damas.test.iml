@@ -8,6 +8,8 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="br.com.finalcraft.Jogo-de-Damas.main" />
     <orderEntry type="library" name="Gradle: com.jfoenix:jfoenix:8.0.8" level="project" />
+    <orderEntry type="library" name="Gradle: org.mariadb.jdbc:mariadb-java-client:2.5.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.mybatis:mybatis:3.4.5" level="project" />
   </component>
   <component name="TestModuleProperties" production-module="br.com.finalcraft.Jogo-de-Damas.main" />
 </module>

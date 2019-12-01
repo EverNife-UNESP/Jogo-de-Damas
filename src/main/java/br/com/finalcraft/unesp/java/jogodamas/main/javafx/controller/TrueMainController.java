@@ -2,6 +2,7 @@ package br.com.finalcraft.unesp.java.jogodamas.main.javafx.controller;
 
 import br.com.finalcraft.unesp.java.jogodamas.client.javafx.controller.CheckersController;
 import br.com.finalcraft.unesp.java.jogodamas.client.javafx.controller.ClientController;
+import br.com.finalcraft.unesp.java.jogodamas.client.javafx.controller.SimulatorController;
 import br.com.finalcraft.unesp.java.jogodamas.common.application.CheckersTheGame;
 import br.com.finalcraft.unesp.java.jogodamas.common.application.data.enums.PlayerType;
 import br.com.finalcraft.unesp.java.jogodamas.server.javafx.controller.ServerController;
@@ -62,4 +63,10 @@ public class TrueMainController {
         CheckersTheGame.instance.isSinglePlayer = true;
         CheckersController.show();
     }
+
+    @FXML
+    void onSimularPartidas() {
+        SimulatorController.show();
+    }
+
 }
