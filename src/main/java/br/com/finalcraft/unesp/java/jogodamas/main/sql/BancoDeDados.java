@@ -89,6 +89,16 @@ public class BancoDeDados {
         return false;
     }
 
+    public static List<SQLPlayer> getAllPlayersWithJustNames() throws SQLException{
+        ResultSet rs = getConnection().createStatement().executeQuery("SELECT * FROM players;");
+        List<SQLPlayer> sqlPlayerList = new ArrayList<>();
+        List EMPTY_LIST = new ArrayList();
+        while (rs.next()){
+            sqlPlayerList.add(new SQLPlayer(rs, EMPTY_LIST));
+        }
+        return sqlPlayerList;
+    }
+
     public static List<SQLPlayer> getAllPlayers() throws SQLException{
         List<SQLBattleLog> allBattleLogs = getAllBattleLogs();
         ResultSet rs = getConnection().createStatement().executeQuery("SELECT * FROM players;");
@@ -110,8 +120,37 @@ public class BancoDeDados {
 
     public static void computarBatalha(String playerOne, String playerTwo, int damasPlayerOne, int damasPlayerTwo, String winner){
         try {
-            String sqlCommand = "insert into battlelogs values('" + playerOne + "', '" + playerTwo + "'," + damasPlayerOne + "," + damasPlayerTwo + ",'" + winner + "', " + System.currentTimeMillis() + ");";
+            boolean playerOnePresent = false;
+            boolean playerTwoPresent = false;
+
+            for (SQLPlayer registeredPlayer : getAllPlayersWithJustNames()) {
+                if (playerOnePresent == false && registeredPlayer.getName().equals(playerOne)){
+                    playerOnePresent = true;
+                }
+                if (playerTwoPresent == false && registeredPlayer.getName().equals(playerTwo)){
+                    playerTwoPresent = true;
+                }
+                if (playerOnePresent && playerTwoPresent){
+                    break;
+                }
+            }
+
+            String sqlCommand;
+            if (!playerOnePresent){
+                sqlCommand = "insert into players values('" + playerOne + "');";
+                SmartLogger.info("Executando: \n" + sqlCommand);
+                getConnection().createStatement().executeQuery(sqlCommand);
+            }
+
+            if (!playerTwoPresent){
+                sqlCommand = "insert into players values('" + playerTwo + "');";
+                SmartLogger.info("Executando: \n" + sqlCommand);
+                getConnection().createStatement().executeQuery(sqlCommand);
+            }
+
+            sqlCommand = "insert into battlelogs values('" + playerOne + "', '" + playerTwo + "'," + damasPlayerOne + "," + damasPlayerTwo + ",'" + winner + "', " + System.currentTimeMillis() + ");";
             SmartLogger.info("Executando: \n" + sqlCommand);
+
             getConnection().createStatement().executeQuery(sqlCommand);
         }catch (Exception e){
             e.printStackTrace();
